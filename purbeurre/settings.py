@@ -35,7 +35,7 @@ else:
 #Allowed hosts
 
 if os.environ.get("ENV") == 'PRODUCTION':
-    ALLOWED_HOSTS = ["pur8eurre.herokuapp.com"] 
+    ALLOWED_HOSTS = ["178.62.50.10"] 
 else:
     ALLOWED_HOSTS = [] #["*"] pour DEBUG = False
 
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -146,7 +146,7 @@ if os.environ.get('ENV') == 'DEVELOPMENT' or os.environ.get('ENV') == 'PRODUCTIO
     
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
     #dj-database-url
     db_from_env = dj_database_url.config(conn_max_age=500)
