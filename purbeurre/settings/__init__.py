@@ -22,22 +22,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if os.environ.get("ENV") == 'DEVELOPMENT':
     SECRET_KEY = 'kh&*ad=1q3ugm6uf5tdh7g#=2pe9r@g*2$224q0s0md_q(%)p4'
-elif os.environ.get("ENV") == 'PRODUCTION':
-    SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-if os.environ.get('ENV') == 'PRODUCTION':
-    DEBUG = False
-else:
-    DEBUG = True
+DEBUG = True
 
 #Allowed hosts
 
-if os.environ.get("ENV") == 'PRODUCTION':
-    ALLOWED_HOSTS = ["178.62.50.10"] 
-else:
-    ALLOWED_HOSTS = [] #["*"] pour DEBUG = False
+ALLOWED_HOSTS = [] #["*"] pour DEBUG = False
 
 # Application definition
 
@@ -54,7 +46,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,7 +81,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'pur_beurre',
-        'USER': 'p10',
+        'USER': 'P8',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '5432'
@@ -135,19 +126,16 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = "/signin"
 
-#For the staticfiles in Heroku
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) #Donc purbeurre/purbeurre
 
-if os.environ.get('ENV') == 'DEVELOPMENT' or os.environ.get('ENV') == 'PRODUCTION': #PRODUCTION uniquement noramellement
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) #Donc purbeurre/purbeurre
-    STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-    STATICFILES_DIRS = (
-        os.path.join(PROJECT_ROOT, 'static'),
-    ) # Extra places for collectstatic to find static files.
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+) 
     
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#dj-database-url
 
-    #dj-database-url
-    db_from_env = dj_database_url.config(conn_max_age=500)
-    DATABASES['default'].update(db_from_env)
+db_from_env = dj_database_url.config(conn_max_age=500)
+
+DATABASES['default'].update(db_from_env)
