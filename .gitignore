@@ -1,0 +1,9 @@
+.vscode
+.DS_Store
+__pycache__
+env/
+config_tests.py
+purbeurre/settings/production.py
+purbeurre/purbeurre/__pycache__
+purbeurre/website/__pycache__
+purbeurre/website/migrations/__pycache__
