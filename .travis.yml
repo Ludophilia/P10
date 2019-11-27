@@ -1,19 +1,14 @@
 language: python
-python:
-  - '3.6'
+python: '3.6'
 
-install:
-  - pip install -r requirements.txt
+install: pip install -r requirements.txt
 
 env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT"
 
-services:
-  - postgresql
+services: postgresql
 
-script:
-  - ./manage.py test
+script: ./manage.py test
 
 branches:
-  only:
-    - staging
+  only: staging
 
