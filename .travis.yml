@@ -1,8 +1,8 @@
 language: python
 python:
-  - '3.6.8'
+  - '3.6'
 
-before_script:
+install:
   - pip install -r requirements.txt
 
 env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT"
