@@ -1,3 +1,7 @@
+if: branch = staging
+
+dist: bionic
+
 language: python
 python: '3.6'
 
@@ -7,8 +11,4 @@ env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT"
 
 services: postgresql
 
-script: ./manage.py test
-
-branches:
-  only: staging
-
+script: ./manage.py test --tag="data-added"
