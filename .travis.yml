@@ -1,7 +1,5 @@
 if: branch = staging
 
-dist: bionic
-
 language: python
 python: '3.6'
 
