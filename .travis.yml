@@ -2,20 +2,16 @@ if: branch = staging
 
 os: linux
 
-language: python
+language: python "3.6"
 
 addons:
   chrome: stable
-
-before-install:
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost
-
 
 install:
   - sudo apt install unzip
   - pip install -r requirements.txt
 
-env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT"
+env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT", TEST_ENV="TRAVIS_CI"
 services: postgresql
 
 before_script:
