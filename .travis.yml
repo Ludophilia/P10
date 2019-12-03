@@ -1,12 +1,20 @@
 if: branch = staging
-
 language: python
-python: '3.6'
 
-install: pip install -r requirements.txt
+addons:
+chrome: stable
+
+install:
+- sudo apt install unzip
+- pip install -r requirements.txt
 
 env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT"
-
 services: postgresql
 
-script: ./manage.py test --tag="data-added"
+before-script:
+- wget https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip
+- unzip chromedriver_linux64.zip -d $HOME/P10
+- google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost
+
+script: ./manage.py test --tag="repl_workin"
+

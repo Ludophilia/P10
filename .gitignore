@@ -2,6 +2,7 @@
 .DS_Store
 __pycache__
 env/
+chromedriver
 purbeurre/settings/production.py
 purbeurre/purbeurre/__pycache__
 purbeurre/website/__pycache__
