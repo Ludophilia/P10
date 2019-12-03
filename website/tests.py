@@ -18,7 +18,8 @@ import os, time, random
 options = webdriver.ChromeOptions()
 
 if os.environ.get("TEST_ENV")=="TRAVIS_CI":
-    options.add_argument("headless")
+    # options.add_argument("headless")
+    pass
 
 @tag("example")
 class TestExample(SimpleTestCase):
