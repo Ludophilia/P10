@@ -25,5 +25,5 @@ before_script:
   - "export DISPLAY=:99.0"
   - sleep 3
 
-script: ./manage.py test --tag="repl_404"
+script: ./manage.py test --tag="account"
 
