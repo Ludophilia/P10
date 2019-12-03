@@ -2,7 +2,8 @@ if: branch = staging
 
 os: linux
 
-language: python "3.6"
+language: python 
+python: "3.6"
 
 addons:
   chrome: stable
@@ -16,7 +17,7 @@ services: postgresql
 
 before_script:
   - wget https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip -d $HOME/P10
+  - unzip chromedriver_linux64.zip -d $HOME/build/Ludophilia/P10
 
 script: ./manage.py test --tag="repl_workin"
 
