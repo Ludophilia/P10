@@ -23,7 +23,6 @@ before_script:
   - wget https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip -d $HOME/build/Ludophilia/P10
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   - sleep 3
 
 script: ./manage.py test --tag="repl_404"
