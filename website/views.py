@@ -10,9 +10,17 @@ from django.urls import reverse
 from django.http.response import HttpResponseRedirect
 from django.http import HttpResponse, Http404
 
-import os, json
+import os, json, logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def home(request):
+
+    logger.info('New visitor', exc_info=True, extra={
+        # Optionally pass a request and we'll grab any information we can
+        'request': request,
+    })
     
     var = {'title': "P8 - Plateforme pour Amateurs de Nutella"}
         
