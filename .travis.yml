@@ -21,7 +21,7 @@ env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT", TEST
 
 before_script:
   - wget https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip -du $HOME/build/Ludophilia/P10
+  - unzip -u chromedriver_linux64.zip -d $HOME/build/Ludophilia/P10
 
 script:
  - ./manage.py test --tag="example"
