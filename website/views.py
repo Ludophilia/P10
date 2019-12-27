@@ -22,7 +22,7 @@ def home(request):
         'request': request,
     })
     
-    var = {'title': "P8 - Plateforme pour Amateurs de Nutella"}
+    var = {'title': "P10 - Plateforme pour Amateurs de Nutella"}
         
     return render(request, "home.html", var)
 

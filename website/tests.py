@@ -25,8 +25,9 @@ class TestExample(SimpleTestCase):
     
     def test_if_the_page_is_at_the_right_address(self):
         
-        response = self.client.get('')
+        response = self.client.get('https://purbeurre.space')
         self.assertEqual(response.status_code, 200) # Verifier que l'adresse est la bonne. Ou plutôt qu'on arrive à l'atteindre. #Code 200.
+
 
 @tag("db_addition")
 class TestProductAdditionToDatabase(TestCase):

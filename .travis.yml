@@ -1,19 +1,27 @@
-language: python
-python:
-  - '3.6.8'
+if: branch = master
 
-before_script:
-  - pip install -r requirements.txt
-
-env: DJANGO_SETTINGS_MODULE="purbeurre.settings"
+os: linux
+dist: xenial
 
 services:
   - postgresql
+  - xvfb
+
+language: python 
+python: "3.6"
+
+addons:
+  chrome: stable
+
+install:
+  - sudo apt install unzip
+  - pip install -r requirements.txt
+
+env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT", TEST_ENV="TRAVIS_CI"
+
+before_script:
+  - wget https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip -d $HOME/build/Ludophilia/P10
 
 script:
-  - ./manage.py test
-
-branches:
-  only:
-    - staging
-
+ - ./manage.py test --tag="example"
