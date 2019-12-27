@@ -13,6 +13,13 @@ from selenium.webdriver.common.keys import Keys
 from decimal import Decimal
 import os, time, random
 
+# A quick n dirty way to make this sh* compatible with travis-ci
+
+options = webdriver.ChromeOptions()
+
+if os.environ.get("TEST_ENV")=="TRAVIS_CI":
+    # options.add_argument("headless")
+    pass
 
 @tag("example")
 class TestExample(SimpleTestCase):
@@ -158,7 +165,7 @@ class TestProductReplacementFunction(StaticLiveServerTestCase):
     def setUp(self):
         self.command = Command()
         self.command.handle()
-        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)), "chromedriver"))
+        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)), "chromedriver"), chrome_options=options)
    
     def tearDown(self):
         self.driver.quit() 
