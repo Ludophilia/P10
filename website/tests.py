@@ -11,30 +11,36 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from decimal import Decimal
-import os, time, random
+import os, time, random, requests
 
 # A quick n dirty way to make this sh* compatible with travis-ci
 
 options = webdriver.ChromeOptions()
 
-if os.environ.get("TEST_ENV")=="TRAVIS_CI":
-    # options.add_argument("headless")
-    pass
+# And now the tests.
 
-@tag("example")
+@tag("https")
 class TestExample(SimpleTestCase):
     
-    def setUp(self):
-        self.client = Client()
+    # - Tester que http://178.62.50.10 ne renvoie rien (erreur 444)
 
-    def tearDown(self):
-        pass 
-    
-    def test_if_the_page_is_at_the_right_address(self):
+    @tag("gone")
+    def test_if_the_user_cant_reach_the_original_website_adress(self):
         
-        response = self.client.get('http://purbeurre.space')
-        self.assertEqual(response.status_code, 200) # Verifier que l'adresse est la bonne. Ou plutôt qu'on arrive à l'atteindre. #Code 200.
+        with self.assertRaises(requests.exceptions.ConnectionError):
+            requests.get("http://178.62.50.10")
 
+    #Tester que http://purbeurre.space ou http://www.purbeurre.space renvoie respectivement sur leur équivalent en https.
+
+    @tag("httpsr")
+    def test_if_the_user_is_correctly_redirected_to_the_https_version_of_the_site(self):
+        
+        for url in ["purbeurre.space/", "www.purbeurre.space/"]:
+            request = requests.get("http://" + url)
+
+            self.assertEqual(request.history[0].status_code, 301) #On teste qu'il y a bien eu redirection
+            self.assertEqual(request.status_code, 200) #Est-on bien arrivé quelque part ? 
+            self.assertEqual(request.url, "https://" + url) # Sur la version https ?
 
 @tag("db_addition")
 class TestProductAdditionToDatabase(TestCase):
