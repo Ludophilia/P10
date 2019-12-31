@@ -3,6 +3,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
+from django.core.management import call_command
 from website.models import Product, Nutrition, Media, Record
 from website.management.commands.add_off_data import Command
 from website.selection_tools import replacement_picker, sugary_product_categories, product_url_builder
@@ -20,7 +21,7 @@ options = webdriver.ChromeOptions()
 # And now the tests.
 
 @tag("https")
-class TestExample(SimpleTestCase):
+class TestWebsiteAccess(SimpleTestCase):
     
     # - Tester que http://178.62.50.10 ne renvoie rien (erreur 444)
 
@@ -43,15 +44,23 @@ class TestExample(SimpleTestCase):
             self.assertEqual(request.url, "https://" + url) # Sur la version https ?
 
 @tag("db_addition")
-class TestProductAdditionToDatabase(TestCase):
+class TestProductAdditionAndUpdateToDatabase(TestCase):
     
     def setUp(self):
-        self.command = Command() 
+        self.command = Command()
+        call_command('loaddata', 'website/dumps/website.json') #Charge de vieilles données pour voir comment mon code réagit à la mise à jour:
         self.command.handle()
 
     def tearDown(self):
         pass 
  
+    @tag("data-validity")
+    def test_if_the_data_is_still_valid(self):
+        
+        for product in Product.objects.all():
+            request = requests.get(product.off_url)
+            self.assertEqual(request.status_code, 200)
+    
     @tag("data-added")
     def test_if_data_has_been_added(self):
         
@@ -60,7 +69,7 @@ class TestProductAdditionToDatabase(TestCase):
         total_media = Media.objects.count()
 
         self.assertGreaterEqual(total_products, 36*15) #Make sure there is more than 540 items or 15 items per category
-        print("total products:", total_products) #Tester feedback
+        print("total products:", total_products)
 
         self.assertGreaterEqual(total_nutrition, 36*15)
         print("total nutrition:", total_nutrition)

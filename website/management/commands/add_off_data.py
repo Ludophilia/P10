@@ -55,50 +55,70 @@ class Command(BaseCommand):
         except:
             return False
 
+    def check_previous_data_validity(self):
+        
+        deletions = 0
+
+        if Product.objects.count() > 0:
+
+            for product in Product.objects.all():
+                r = requests.get(product.off_url)
+
+                if r.status_code != 200:
+                    product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
+                    deletions += 1
+
+        print("{} suppression(s) de produit".format(deletions))
+
     def handle(self, *args, **options): 
         
-        products_already_in_db = list()
-        number_of_products = Product.objects.all().count() #Redondant
-        
-        if number_of_products == 0:
+        products_already_updated = list()
 
-            for category in self.get_categories_from_categories_txt():
+        self.check_previous_data_validity()
 
-                for product in self.get_products_data_list_from_off(category, 20, 1):
-                    
-                    if self.check_if_important_values_exist(product):
+        for category in self.get_categories_from_categories_txt():
 
-                        product_name = self.get_product_data(product, "product_name_fr")
+            for product in self.get_products_data_list_from_off(category, 20, 1):
+                
+                if self.check_if_important_values_exist(product):
 
-                        if product_name not in products_already_in_db: 
-                        
-                            products_already_in_db += [product_name]
+                    product_name = self.get_product_data(product, "product_name_fr")
 
-                            product_entry = Product.objects.create(
-                                product_name = product_name,
-                                off_url = self.get_product_data(product, "url"), 
-                                category = category
-                            )
+                    if product_name not in products_already_updated:
 
-                            Media.objects.create(
-                                product = product_entry,
-                                image_front_url = self.get_product_data(product, "image_front_url"),
-                                image_full_url = self.get_product_data(product, "image_full_url")
-                            )
+                        products_already_updated += [product_name]
 
-                            Nutrition.objects.create(
-                                product = product_entry,
-                                nutriscore = self.get_product_data(product, "nutrition_grade_fr"),
-                                energy_100g = self.get_product_data(product, "energy_100g"),
-                                energy_unit = self.get_product_data(product, "energy_unit"),
-                                proteins_100g = self.get_product_data(product, "proteins_100g"),
-                                fat_100g = self.get_product_data(product, "fat_100g"),
-                                saturated_fat_100g = self.get_product_data(product, "saturated-fat_100g"),
-                                carbohydrates_100g = self.get_product_data(product, "carbohydrates_100g"),
-                                sugars_100g = self.get_product_data(product, "sugars_100g"),
-                                fiber_100g = self.get_product_data(product, "fiber_100g"),
-                                salt_100g = self.get_product_data(product, "salt_100g")
-                            )
+                        product_entry = Product.objects.update_or_create(
+                            product_name = product_name,
+                            defaults = {
+                                'off_url' : self.get_product_data(product, "url"),
+                                'category' : category
+                            }
+                        )[0] 
+
+                        Media.objects.update_or_create(
+                            product = product_entry,
+                            defaults = {
+                                'image_front_url' : self.get_product_data(product, "image_front_url"),
+                                'image_full_url' : self.get_product_data(product, "image_full_url")
+                            }
+                        )[0]
+
+                        Nutrition.objects.update_or_create(
+                            product = product_entry,
+                            defaults = {
+                                'nutriscore' : self.get_product_data(product, "nutrition_grade_fr"),
+                                'energy_100g' : self.get_product_data(product, "energy_100g"),
+                                'energy_unit' : self.get_product_data(product, "energy_unit"),
+                                'proteins_100g' : self.get_product_data(product, "proteins_100g"),
+                                'fat_100g' : self.get_product_data(product, "fat_100g"),
+                                'saturated_fat_100g' : self.get_product_data(product, "saturated-fat_100g"),
+                                'carbohydrates_100g' : self.get_product_data(product, "carbohydrates_100g"),
+                                'sugars_100g' : self.get_product_data(product, "sugars_100g"),
+                                'fiber_100g' : self.get_product_data(product, "fiber_100g"),
+                                'salt_100g' : self.get_product_data(product, "salt_100g")
+                            }
+                        )[0]
 
     def show_data(self, type_data):
         
