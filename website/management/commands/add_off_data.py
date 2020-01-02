@@ -57,11 +57,15 @@ class Command(BaseCommand):
 
     def check_previous_data_validity(self):
         
-        print("Début vérification précédentes données\n")
+        print("Vérification précédentes données...")
+        
+        products = Product.objects.count()
 
-        deletions = 0
+        if products > 0:
 
-        if Product.objects.count() > 0:
+            deletions = 0
+
+            print("...{} produit(s) trouvés...".format(products))
 
             for product in Product.objects.all():
                 r = requests.get(product.off_url)
@@ -70,13 +74,19 @@ class Command(BaseCommand):
                     product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
                     deletions += 1
 
-        print("Résultat: {} suppression(s) de produit".format(deletions))
+            print("...{} produit(s) supprimé(s).".format(deletions))
+
+        else:
+            print("...aucune donnée à supprimer.")
 
     def handle(self, *args, **options): 
         
         products_already_updated = list()
+        products_created = 0
 
         self.check_previous_data_validity()
+
+        print("\nMise à jour des données...")
 
         for category in self.get_categories_from_categories_txt():
 
@@ -90,13 +100,17 @@ class Command(BaseCommand):
 
                         products_already_updated += [product_name]
 
-                        product_entry = Product.objects.update_or_create(
+                        product_and_update_status = Product.objects.update_or_create(
                             product_name = product_name,
                             defaults = {
                                 'off_url' : self.get_product_data(product, "url"),
                                 'category' : category
                             }
-                        )[0] 
+                        )
+                        
+                        product_entry = product_and_update_status[0] 
+
+                        if product_and_update_status[1]: products_created += 1
 
                         Media.objects.update_or_create(
                             product = product_entry,
@@ -121,6 +135,8 @@ class Command(BaseCommand):
                                 'salt_100g' : self.get_product_data(product, "salt_100g")
                             }
                         )[0]
+
+        print("...{} produit(s) créé(s)... \n{} produit(s) au total.".format(products_created, Product.objects.count()))
 
     def show_data(self, type_data):
         
