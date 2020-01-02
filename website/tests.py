@@ -95,8 +95,7 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
         for product in Product.objects.all():
             self.assertNotEqual(len(product.product_name), 0) 
             self.assertIn(product.category, categories)
-            request = requests.get(product.off_url)
-            self.assertEqual(request.status_code, 200)
+            self.assertIn("https://fr.openfoodfacts.org/produit/", product.off_url)
     
     @tag("media-quality")
     def test_the_quality_of_media_data(self):

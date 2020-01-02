@@ -57,6 +57,8 @@ class Command(BaseCommand):
 
     def check_previous_data_validity(self):
         
+        print("Début vérification précédentes données\n")
+
         deletions = 0
 
         if Product.objects.count() > 0:
@@ -68,7 +70,7 @@ class Command(BaseCommand):
                     product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
                     deletions += 1
 
-        print("Vérification précédentes données: {} suppression(s) de produit".format(deletions))
+        print("Résultat: {} suppression(s) de produit".format(deletions))
 
     def handle(self, *args, **options): 
         
