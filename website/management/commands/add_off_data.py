@@ -68,7 +68,7 @@ class Command(BaseCommand):
                     product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
                     deletions += 1
 
-        print("{} suppression(s) de produit".format(deletions))
+        print("Vérification précédentes données: {} suppression(s) de produit".format(deletions))
 
     def handle(self, *args, **options): 
         

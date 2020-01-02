@@ -24,4 +24,4 @@ before_script:
   - unzip -u chromedriver_linux64.zip -d $HOME/build/Ludophilia/P10
 
 script:
- - ./manage.py test --tag="db_addition"
+ - ./manage.py test --tag="product-quality"

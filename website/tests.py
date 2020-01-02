@@ -47,28 +47,25 @@ class TestWebsiteAccess(SimpleTestCase):
 class TestProductAdditionAndUpdateToDatabase(TestCase):
     
     def setUp(self):
+        #Charge de vieilles données pour voir comment mon code réagit à la mise à jour
         self.command = Command()
-        call_command('loaddata', 'website/dumps/website.json') #Charge de vieilles données pour voir comment mon code réagit à la mise à jour:
+        call_command('loaddata', 'website/dumps/website.json') 
         self.command.handle()
 
     def tearDown(self):
         pass 
  
-    @tag("data-validity")
-    def test_if_the_data_is_still_valid(self):
-        
-        for product in Product.objects.all():
-            request = requests.get(product.off_url)
-            self.assertEqual(request.status_code, 200)
-    
+ 
     @tag("data-added")
     def test_if_data_has_been_added(self):
         
+        print("\nTest d'ajout: les produits ont-ils bien été ajoutés ? Y'a-t-il le meme nombre de produits dans chaque table ? Y'a-t-il plus de 15 produits par catégorie ?\n")
+
         total_products = Product.objects.count()
         total_nutrition = Nutrition.objects.count()
         total_media = Media.objects.count()
 
-        self.assertGreaterEqual(total_products, 36*15) #Make sure there is more than 540 items or 15 items per category
+        self.assertGreaterEqual(total_products, 36*15) 
         print("total products:", total_products)
 
         self.assertGreaterEqual(total_nutrition, 36*15)
@@ -81,13 +78,13 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
         self.assertEqual(total_nutrition, total_media)
 
         if total_products == total_nutrition and total_nutrition == total_media: 
-            print("Données uniformes, vous pouvez y aller!")
-            if total_products < 600:
-                print("C'est moins que la dernière fois en revanche.")
+            print("Données uniformes, vous pouvez y aller!\n")
 
     @tag("product-quality")
     def test_the_quality_of_product_data(self):
 
+        print("\nTest de qualité données : les produits ont-ils bien un nom ? Appartiennent-ils à une catégorie valide ? Ont-ils une adresse off valide?\n")
+        
         def get_categories_from_categories_txt():
             file_path = os.path.join(os.path.dirname(__file__), "management", "commands", "categories.txt")
             with open(file_path) as f: 
@@ -98,10 +95,13 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
         for product in Product.objects.all():
             self.assertNotEqual(len(product.product_name), 0) 
             self.assertIn(product.category, categories)
-            self.assertIn("https://fr.openfoodfacts.org/produit/", product.off_url)
+            request = requests.get(product.off_url)
+            self.assertEqual(request.status_code, 200)
     
     @tag("media-quality")
     def test_the_quality_of_media_data(self):
+
+        print("\nTest de qualité données : les images ont-elles un format d'url valide ?\n")
 
         for media in Media.objects.all():
             self.assertIn("https://static.openfoodfacts.org/images/products/", media.image_full_url)
@@ -112,6 +112,8 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
     @tag("nutrition-quality")
     def test_the_quality_of_nutrition_data(self):
         
+        print("\nTest de qualité données : les données nutritionneles ont-elles un format valide ?\n")
+
         for nutrition in Nutrition.objects.all():
             self.assertIn(nutrition.nutriscore, "abcde")
 
