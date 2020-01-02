@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
     def check_previous_data_validity(self):
         
-        print("Vérification précédentes données...")
+        print("Vérification des précédentes données...")
         
         products = Product.objects.count()
 
@@ -66,6 +66,7 @@ class Command(BaseCommand):
             deletions = 0
 
             print("...{} produit(s) trouvés...".format(products))
+            print("...suppression des données obsolètes...")
 
             for product in Product.objects.all():
                 r = requests.get(product.off_url)
@@ -74,9 +75,10 @@ class Command(BaseCommand):
                     product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
                     deletions += 1
 
-            print("...{} produit(s) supprimé(s).".format(deletions))
-
-        else:
+            if deletions > 0:
+                print("...{} produit(s) supprimé(s).".format(deletions))
+            
+        if products == 0 or deletions == 0:
             print("...aucune donnée à supprimer.")
 
     def handle(self, *args, **options): 
@@ -136,7 +138,7 @@ class Command(BaseCommand):
                             }
                         )[0]
 
-        print("...{} produit(s) créé(s)... \n{} produit(s) au total.".format(products_created, Product.objects.count()))
+        print("...{} nouveau(x) produit(s) ajoutés(s)... \n{} produit(s) au total.".format(products_created, Product.objects.count()))
 
     def show_data(self, type_data):
         
