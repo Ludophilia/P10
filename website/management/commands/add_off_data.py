@@ -138,7 +138,7 @@ class Command(BaseCommand):
                             }
                         )[0]
 
-        print("...{} nouveau(x) produit(s) ajoutés(s)... \n{} produit(s) au total.\n\n\n\n".format(products_created, Product.objects.count()))
+        print("...{} nouveau(x) produit(s) ajoutés(s)... \n{} produit(s) au total.\n\n".format(products_created, Product.objects.count()))
 
     def show_data(self, type_data):
         
