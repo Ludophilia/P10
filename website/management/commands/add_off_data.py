@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from website.models import Product, Nutrition, Media
-import requests, os, re
+import requests, os, re, time
 
 class Command(BaseCommand):
     
@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
     def check_previous_data_validity(self):
         
-        print("Vérification des précédentes données...")
+        print("{}:  Vérification des précédentes données...".format(time.strftime("%a %d/%m/%Y, %X")))
         
         products = Product.objects.count()
 
@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         self.check_previous_data_validity()
 
-        print("\nMise à jour des données...")
+        print("\n{}: Mise à jour des données...".format(time.strftime("%a %d/%m/%Y, %X")))
 
         for category in self.get_categories_from_categories_txt():
 
