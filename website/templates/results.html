@@ -2,27 +2,27 @@
 {% load static %}
 
 {% block header_background %} {{ product.product.media.image_full_url }} {% endblock %}
-{% block product_name %} Substituts : <a class="text-white" href="{{ product.url }}">{{ product.product }}</a> {% endblock %}
+{% block product_name %} <a class="text-white" href="/product?query={{ product.product|urlencode }}">{{ product.product }}</a> {% endblock %}
 
 {% block subheader %}
 
 <section>
     <div class="container" style="margin-top:30px">
         <div class="row justify-content-center">
-            {% for substitute in substitutes_wrapped %} 
+            {% for substitute_wrapped in substitutes_wrapped %} 
             <div class="col-lg-4 col-10 mb-4" > 
-                <div class="card" name="{{ substitute.product }}">
-                    <a href="{{ substitute.url }}">
-                        <img src="{{ substitute.product.media.image_full_url }}" class="card-img-top" alt="Image produit" style="object-fit: cover" height="350">
+                <div class="card" name="{{ substitute_wrapped.product }}">
+                    <a href="/product?query={{ substitute_wrapped.product|urlencode }}">
+                        <img src="{{ substitute_wrapped.product.media.image_full_url }}" class="card-img-top" alt="image produit" style="object-fit: cover" height="350">
                     </a>
-                    <span class="n-badge bg-primary">{{ substitute.product.nutrition.nutriscore }}</span>
+                    <span class="n-badge n-level-{{ substitute_wrapped.product.nutrition.nutriscore }}"><strong>{{ substitute_wrapped.product.nutrition.nutriscore|upper }}</strong></span>
                     <div class="card-body" style="height:110px">
                         <h3 class="results card-title">
-                            <a href="{{ substitute.url }}">{{ substitute.product }}</a>
+                            <a href="/product?query={{ substitute_wrapped.product|urlencode }}">{{ substitute_wrapped.product }}</a>
                         </h3>
                         {% if user.is_authenticated %} 
                         <div class="card-subtitle text-muted">
-                            <i class="far fa-save"></i> <a href="{% url 'save' %}" class="mx-1 save-link">{{ substitute.status }}</a> 
+                            <i class="far fa-save"></i> <a href="{% url 'save' %}" data-url="{{ substitute_wrapped.product|urlencode }}" class="mx-1 save-link">{{ substitute_wrapped.status }}</a> 
                         </div>
                         {% else %}
                         <div class="card-subtitle text-muted">

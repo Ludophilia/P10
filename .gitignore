@@ -1,9 +1,8 @@
 .vscode
 .DS_Store
 __pycache__
-env/
+*env
 chromedriver
 purbeurre/settings/production.py
-purbeurre/purbeurre/__pycache__
-purbeurre/website/__pycache__
-purbeurre/website/migrations/__pycache__
+__pycache__
+__staticfiles

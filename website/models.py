@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User #Pour reference de clé étrangère
-
-# Create your models here.
+from django.contrib.auth.models import User
 
 class Product(models.Model):
     product_name = models.CharField(max_length=200, primary_key=True)
@@ -40,8 +38,6 @@ class Media(models.Model):
 
     class Meta:
         db_table = "media"
-
-#Modifié, attention au modèle physique
 
 class Record(models.Model):
     record_id = models.AutoField(primary_key=True)

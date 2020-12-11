@@ -2,26 +2,26 @@
 {% load static %}
 
 {% block header_background %} {% static "img/food-banse.jpg" %} {% endblock %} 
-{% block product_name %} Mes substituts {% endblock %}
+{% block product_name %} Mes produits {% endblock %}
 
 {% block subheader %}
 <section>
     <div class="container" style="margin-top:30px"> 
         <div class="row justify-content-center">
-            {% if myproducts %}
-            {% for product in myproducts %} 
+            {% if products_wrapped %}
+            {% for product_wrapped in products_wrapped %} 
             <div class="col-lg-4 col-10 mb-4" > 
-                <div class="card" name="{{ product.product }}">
-                    <a href={{ product.url }}>
-                        <img src="{{ product.product.media.image_full_url }}" class="card-img-top" alt="..." style="object-fit: cover" height="400">
+                <div class="card" name="{{ product_wrapped.product }}">
+                    <a href="/product?query={{ product_wrapped.product|urlencode }}">
+                        <img src="{{ product_wrapped.product.media.image_full_url }}" class="card-img-top" alt="..." style="object-fit: cover" height="400">
                     </a>
-                    <span class="n-badge bg-primary">{{ product.product.nutrition.nutriscore }}</span>
+                    <span class="n-badge n-level-{{ product_wrapped.product.nutrition.nutriscore }}"><strong>{{ product_wrapped.product.nutrition.nutriscore|upper }}</strong></span>
                     <div class="card-body" style="height:110px">
                         <h3 class="results card-title">
-                            <a href={{ product.url }}>{{ product.product.product_name }}</a>
+                            <a href="/product?query={{ product_wrapped.product|urlencode }}">{{ product_wrapped.product.product_name }}</a>
                         </h3>
                         <div class="card-subtitle text-muted">
-                            <i class="far fa-save"></i> <a href="" class="mx-1 save-link"> Sauvegardé </a> 
+                            <i class="far fa-save"></i> <a href="{% url 'save' %}" data-url="{{ product_wrapped.product|urlencode }}" class="mx-1 save-link">{{ product_wrapped.status }}</a> 
                         </div>
                     </div>
                 </div>

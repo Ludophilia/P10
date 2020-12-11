@@ -1,24 +1,23 @@
-ul.errorlist.nonfield {
+/* Additional css rules */
 
-    list-style-type: none;
-    padding: 0;
-    width: 100%;
-    margin: 2rem 0;
-    font-size: 80%;
-    font-weight: bold;
-    color: #ff1e00;
-    text-align: center;
+/* Home Page */
+
+/* Results Page */
+
+header.mastheadtwo {
+    padding-top: 10rem;
+    padding-bottom: 6rem;
 }
 
-/* Legal */
-
-p.legal-text > a {
-    color:rgb(0, 0, 0);
-    text-decoration: underline;
-    background-color:transparent;
+@media (max-width: 991px) {
+    h1 {
+        font-size: 1.75rem; 
+    }
+    header.mastheadtwo {
+        padding-top: 10rem;
+        padding-bottom: 5rem;
+    }  
 }
-
-/* Exclusive results page classes */
 
 .results {
     font-family: BlinkMacSystemFont, "Merriweather Sans", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -43,9 +42,107 @@ h3.results {
     position: absolute;
     top: -10px;
     right: -10px;
-    padding: 5px 10px;
+    padding: 5px 9px;
     border-radius: 50%;
+    line-height: 18px;
     color: white;
+}
+
+.n-level-a {
+    background: #0b8344;
+}
+
+.n-level-b {
+    background: #86bb30;
+}
+
+.n-level-c {
+    background: #ffcc05;
+}
+
+.n-level-d {
+    background: #ee8202;
+}
+
+.n-level-e {
+    background: #e64113;
+}
+
+.n-fr-level-a {
+    color: #0b8344;
+}
+
+.n-fr-level-b {
+    color: #86bb30;
+}
+
+.n-fr-level-c {
+    color: #ffcc05;
+}
+
+.n-fr-level-d {
+    color: #ee8202;
+}
+
+.n-fr-level-e {
+    color: #e64113;
+}
+
+.card {
+    border: none;
+}
+
+.card-body {
+    padding-left: 0px;
+}
+
+/* Product Page */
+
+#product_img {
+    height: 450px;
+    object-fit: scale-down;
+}
+
+@media (min-width: 992px) {
+
+    #product_img {
+        height: 500px;
+        object-fit: scale-down;
+    }
+
+    #nutrition-info {
+        padding-top: 50px;
+    }
+}
+
+/* Signin Page */
+
+ul.errorlist.nonfield {
+
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+    margin: 2rem 0;
+    font-size: 80%;
+    font-weight: bold;
+    color: #ff1e00;
+    text-align: center;
+}
+
+/* Legal Page */
+
+p.legal-text > a {
+    color:rgb(0, 0, 0);
+    text-decoration: underline;
+    background-color:transparent;
+}
+
+/* Menu Page */
+
+@media (min-width: 992px) {
+    .opt-icon-label {
+        display: none;
+    }
 }
 
 /* Autocomplete feature */

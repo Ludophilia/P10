@@ -1,31 +1,34 @@
 {% extends "base_mfh.html" %}
 {% load static %}
 
-{% block header_background %} {{ product.media.image_full_url }} {% endblock %}
-{% block product_name %} {{ product.product_name }} {% endblock %}
+{% block header_background %} {{ product_wrapped.product.media.image_full_url }} {% endblock %}
+{% block product_name %} {{ product_wrapped.product.product_name }} {% endblock %}
 
 {% block subheader %}
 
 <div class="container text-center" style="padding: 25px 0%">
-    <div class="row justify-content-center">
-        <div class="col-lg-4 col-md-7 col-10 mb-4">
-            <a href="{{ product.media.image_full_url }}">
-                <img src="{{ product.media.image_full_url }}" alt="" height="500px" width="100%" style="object-fit: contain"> 
+    <div class="row justify-content-center" style="margin: 0">
+        <div class="col-lg-5 col-10 mb-4">
+            <a href="{{ product_wrapped.product.media.image_full_url }}">
+                <img id="product_img" src="{{ product_wrapped.product.media.image_full_url }}" alt="img_produit" width="100%"> 
             </a>
         </div>
-        <div class="col-lg-4 col-10 mb-4">
+        <div id="nutrition-info" class="col-lg-5 col-10">
             <h2 class="text-uppercase" style="font-size:20px">POUR 100g</h2>
             <p class="">
-                <strong>Energie :</strong> {{ product.nutrition.energy_100g }} {{ product.nutrition.energy_unit }}<br/>
-                <strong>Lipides :</strong> {{ product.nutrition.fat_100g }} g <br/>
-                <strong>dont graisses saturées :</strong> {{ product.nutrition.saturated_fat_100g }} g <br/>
-                <strong>Sucres :</strong> {{ product.nutrition.sugars_100g }} g <br/>
-                <strong>Sel :</strong> {{ product.nutrition.salt_100g }} g <br/>
-                <a class="" href="{{ product.off_url }}"> Fiche complète sur OpenFoodFacts</a><br/>
+                <strong>Nutriscore</strong> : <span class="n-fr-level-{{ product_wrapped.product.nutrition.nutriscore }}"><strong>{{ product_wrapped.product.nutrition.nutriscore|upper }}</strong></span><br/>
+                <strong>Energie :</strong> {{ product_wrapped.product.nutrition.energy_100g }} {{ product_wrapped.product.nutrition.energy_unit }}<br/>
+                <strong>Lipides :</strong> {{ product_wrapped.product.nutrition.fat_100g }} g <br/>
+                <strong>dont graisses saturées :</strong> {{ product_wrapped.product.nutrition.saturated_fat_100g }} g <br/>
+                <strong>Sucres :</strong> {{ product_wrapped.product.nutrition.sugars_100g }} g <br/>
+                <strong>Sel :</strong> {{ product_wrapped.product.nutrition.salt_100g }} g <br/>
+                <a class="" href="{{ product_wrapped.product.off_url }}"> Fiche complète sur OpenFoodFacts</a><br/><br/>
+                {% if user.is_authenticated %}
+                <i class="far fa-save"></i> <a href="{% url 'save' %}" data-url="{{ product_wrapped.product|urlencode }}" class="mx-1 save-link">{{ product_wrapped.status }}</a>
+                {% else %}
+                <span class="con-link">Connectez-vous pour <i class="far fa-save mx-1"></i></span>
+                {% endif %}
             </p>
-        </div>
-        <div class="col-lg-4 col-10 mb-4">
-            <img src="https://static.openfoodfacts.org/images/misc/nutriscore-{{ product.nutrition.nutriscore }}.svg" alt=""> <br/>
         </div>
     </div>
 </div>

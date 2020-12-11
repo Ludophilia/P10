@@ -1,4 +1,4 @@
-from . import *
+from . import * #import settings ? Because, with this statement, travis.py is imported as well.
 
 DATABASES = {
     'default': {

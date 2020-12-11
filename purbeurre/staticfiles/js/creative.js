@@ -31,9 +31,9 @@
     if ($("#mainNav").offset().top > 100) {
       $("#mainNav").addClass("navbar-scrolled");
     } 
-    // else {
-    //   $("#mainNav").removeClass("navbar-scrolled");
-    // } // Retiré. Génère un bug dans Safari
+    else {
+      $("#mainNav").removeClass("navbar-scrolled");
+    } // Remis en place. Générait un bug dans Safari
   };
   // Collapse now if page is not at top
   navbarCollapse();

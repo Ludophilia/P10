@@ -15,7 +15,6 @@ from decimal import Decimal
 import os, time, random, requests
 
 # A quick n dirty way to make this sh* compatible with travis-ci
-
 options = webdriver.ChromeOptions()
 
 # And now the tests.
