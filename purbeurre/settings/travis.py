@@ -1,4 +1,4 @@
-from . import * #import settings ? Because, with this statement, travis.py is imported as well.
+from . import * #from <current_package> import *. Imports __init__.py code.
 
 DATABASES = {
     'default': {
