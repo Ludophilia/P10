@@ -1,18 +1,20 @@
+import os, time, random, requests
+from decimal import Decimal
+
 from django.test import TestCase, Client, tag, SimpleTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase 
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.core.management import call_command
-from website.models import Product, Nutrition, Media, Record
-from website.management.commands.add_off_data import Command
-from website.selection_tools import replacement_picker, sugary_product_categories, product_url_builder
-from website.views import results
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from decimal import Decimal
-import os, time, random, requests
+
+from website.models import Product, Nutrition, Media, Record
+from website.management.commands.add_off_data import Command
+from website.selection_tools import replacement_picker
+from website.views import results
 
 # A quick n dirty way to make this sh* compatible with travis-ci
 options = webdriver.ChromeOptions()
