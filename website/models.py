@@ -26,7 +26,7 @@ class Nutrition(models.Model):
     salt_100g = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
-        return "Objet nutrition lié à {}".format(self.product.product_name)
+        return f"Nutrition<{self.product}>"
 
     class Meta:
         db_table = "nutrition"
@@ -35,6 +35,9 @@ class Media(models.Model):
     product = models.OneToOneField(Product, to_field="product_name", primary_key=True, on_delete=models.CASCADE)
     image_full_url = models.TextField() 
     image_front_url = models.TextField() 
+
+    def __str__(self):
+        return f"Media<{self.product}>"
 
     class Meta:
         db_table = "media"
@@ -45,7 +48,7 @@ class Record(models.Model):
     substitute = models.ForeignKey(Product, to_field="product_name", on_delete=models.CASCADE, related_name='product_recorded_set')
 
     def __str__(self):
-        return "record_id: {}, from user: {}, product_recorded: {}".format(self.record_id, self.user, self.substitute)
+        return f"Record<{self.user},{self.substitute}>"
 
     class Meta:
         db_table = "record"

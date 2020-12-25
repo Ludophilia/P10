@@ -1,15 +1,20 @@
-from django.core.management.base import BaseCommand, CommandError
-from website.models import Product, Nutrition, Media
-import requests, os, re, time
+import os, re, time
 
-class Command(BaseCommand):
-    
-    def get_categories_from_categories_txt(self):
+import requests
+from django.core.management.base import BaseCommand, CommandError
+
+from website.models import Product, Nutrition, Media
+
+class OFFAPIManager:
+
+    @classmethod
+    def __get_categories(cls) -> list:
         file_path = os.path.join(os.path.dirname(__file__), "categories.txt")
         with open(file_path) as f: 
             return [category.replace("\n","") for category in list(f)]
-
-    def get_products_data_list_from_off(self, search_terms, page_size, page_number):
+    
+    @classmethod
+    def __get_list_of_products(cls, search_terms: str, page_size: int, page_number: int) -> list:
         
         search_pr = {"action": "process", 
         "search_terms": search_terms, 
@@ -25,122 +30,77 @@ class Command(BaseCommand):
         
         return data.json()["products"]
 
-    def get_product_data(self, product_dict, value):
-        
-        type1_values = ["product_name_fr", "url", "nutrition_grade_fr", "image_full_url", "image_front_url"]
+    @classmethod
+    def __are_values_missing(cls, product: dict) -> bool: 
 
         try:
-            if value in type1_values:
-                if value == "image_full_url":
-                    return product_dict["image_front_url"].replace(".400.jpg", ".full.jpg")
-                else:
-                    return product_dict[value]
-            else:
-                return product_dict["nutriments"][value]
-
-        except (KeyError):
-            if re.search(r'^.{3,13}_100g$',value):
-                return -999.99
-            elif re.search(r'^.{3,13}_unit$',value):
-                return "-"
-
-    def check_if_important_values_exist(self, product_dict): 
-
-        try:
-            if len(product_dict["product_name_fr"]) != 0 and len(product_dict["nutrition_grade_fr"]) != 0:
-                if len(product_dict["image_front_url"])!=0 and product_dict["nutriments"]["energy_100g"] >= 0:
-                    return True
-            else:
+            if len(product["product_name_fr"]) != 0 and len(product["nutrition_grade_fr"]) != 0 and len(product["image_front_url"])!= 0 and product["nutriments"]["energy_100g"] >= 0:
                 return False
         except:
-            return False
+            pass
 
-    def check_previous_data_validity(self):
+        return True
         
-        print("{}:  Vérification des précédentes données...".format(time.strftime("%a %d/%m/%Y, %X")))
+    @classmethod
+    def get_product_data(cls, product: dict, key: str) -> str:
         
-        products = Product.objects.count()
+        top_keys = ["category", "product_name_fr", "url", "nutrition_grade_fr", "image_full_url", "image_front_url"]
+        try:
+            if key in top_keys:
+                return product[key] if key != "image_full_url" else product["image_front_url"].replace(".400.jpg", ".full.jpg")
+            else:
+                return str(product["nutriments"][key])
+        except (KeyError):
+            if re.search(r'^.{3,13}_100g$',key):
+                return "-1"
+            elif re.search(r'^.{3,13}_unit$',key):
+                return "-"
+    
+    @classmethod
+    def get_all_products(cls) -> list:
 
-        if products > 0:
+        all_products, watchdog_scope = [], []
 
-            deletions = 0
+        all_products_raw = [{"category": category, **product} for category in cls.__get_categories() 
+            for product in cls.__get_list_of_products(category, 20, 1)
+            if not cls.__are_values_missing(product)]
 
-            print("...{} produit(s) trouvés...".format(products))
-            print("...suppression des données obsolètes...")
+        for product in all_products_raw:
+            product_name = cls.get_product_data(product, "product_name_fr")
+            if product_name not in watchdog_scope:
+                watchdog_scope += [product_name]
+                all_products += [product]
 
-            for product in Product.objects.all():
+        return all_products
+
+class DBManager:
+
+    @staticmethod
+    def check_data_already_in_db() -> None:
+        
+        print(f"\n{time.strftime('%a %d/%m/%Y, %X')}: Vérification des données de produit dans la BDD...")
+        
+        products = Product.objects.all()
+        deletions = 0
+
+        if products.count() > 0:
+
+            print(f"...{products.count()} produit(s) trouvés...\n...suppression des données corrompues...")
+
+            for product in products:
                 r = requests.get(product.off_url)
-
                 if r.status_code != 200:
-                    product.delete() # Vu que on_delete = models.CASCADE dans manage.py, tous les données associées au produit seront supprimées aussi
+                    product.delete()
                     deletions += 1
 
             if deletions > 0:
-                print("...{} produit(s) supprimé(s).".format(deletions))
+                print(f"...{deletions} produit(s) supprimé(s).")
             
         if products == 0 or deletions == 0:
-            print("...aucune donnée à supprimer.")
+            print("0 donnée produit à supprimer.")
 
-    def handle(self, *args, **options): 
-        
-        products_already_updated = list()
-        products_created = 0
-
-        self.check_previous_data_validity()
-
-        print("\n{}: Mise à jour des données...".format(time.strftime("%a %d/%m/%Y, %X")))
-
-        for category in self.get_categories_from_categories_txt():
-
-            for product in self.get_products_data_list_from_off(category, 20, 1):
-                
-                if self.check_if_important_values_exist(product):
-
-                    product_name = self.get_product_data(product, "product_name_fr")
-
-                    if product_name not in products_already_updated:
-
-                        products_already_updated += [product_name]
-
-                        product_and_update_status = Product.objects.update_or_create(
-                            product_name = product_name,
-                            defaults = {
-                                'off_url' : self.get_product_data(product, "url"),
-                                'category' : category
-                            }
-                        )
-                        
-                        product_entry = product_and_update_status[0] 
-
-                        if product_and_update_status[1]: products_created += 1
-
-                        Media.objects.update_or_create(
-                            product = product_entry,
-                            defaults = {
-                                'image_front_url' : self.get_product_data(product, "image_front_url"),
-                                'image_full_url' : self.get_product_data(product, "image_full_url")
-                            }
-                        )[0]
-
-                        Nutrition.objects.update_or_create(
-                            product = product_entry,
-                            defaults = {
-                                'nutriscore' : self.get_product_data(product, "nutrition_grade_fr"),
-                                'energy_100g' : self.get_product_data(product, "energy_100g"),
-                                'energy_unit' : self.get_product_data(product, "energy_unit"),
-                                'proteins_100g' : self.get_product_data(product, "proteins_100g"),
-                                'fat_100g' : self.get_product_data(product, "fat_100g"),
-                                'saturated_fat_100g' : self.get_product_data(product, "saturated-fat_100g"),
-                                'carbohydrates_100g' : self.get_product_data(product, "carbohydrates_100g"),
-                                'sugars_100g' : self.get_product_data(product, "sugars_100g"),
-                                'fiber_100g' : self.get_product_data(product, "fiber_100g"),
-                                'salt_100g' : self.get_product_data(product, "salt_100g")
-                            }
-                        )[0]
-
-        print("...{} nouveau(x) produit(s) ajoutés(s)... \n{} produit(s) au total.\n\n".format(products_created, Product.objects.count()))
-
-    def show_data(self, type_data):
+    @staticmethod
+    def show_data(type_data: str) -> None:
         
         if type_data == "product_data":
             for product in Product.objects.all():
@@ -154,3 +114,75 @@ class Command(BaseCommand):
             for nutriment in Nutrition.objects.all():
                 print("Nutrition:", nutriment.product, nutriment.nutriscore, nutriment.energy_100g, nutriment.energy_unit,
                 nutriment.proteins_100g, nutriment.fat_100g, nutriment.saturated_fat_100g, nutriment.carbohydrates_100g, nutriment.sugars_100g, nutriment.fiber_100g, nutriment.salt_100g)
+
+    @classmethod
+    def __create_or_update_product_data(cls, product: dict) -> (Product, bool):
+        
+        product_entry, has_been_created = Product.objects.update_or_create(
+            defaults = {
+                'off_url' : OFFAPIManager.get_product_data(product, "url"),
+                'category' : OFFAPIManager.get_product_data(product, "category")
+            },
+            product_name = OFFAPIManager.get_product_data(product, "product_name_fr")
+        )
+
+        return (product_entry, has_been_created)
+
+    @classmethod
+    def __create_or_update_media_data(cls, product_entry: Product, product: dict) -> None:
+
+        Media.objects.update_or_create(
+            product = product_entry,
+            defaults = {
+                'image_front_url' : OFFAPIManager.get_product_data(product, "image_front_url"),
+                'image_full_url' : OFFAPIManager.get_product_data(product, "image_full_url")
+            }
+        )
+
+    @classmethod
+    def __create_or_update_nutrition_data(cls, product_entry: Product, product: dict) -> None:
+
+        Nutrition.objects.update_or_create(
+            product = product_entry,
+            defaults = {
+                'nutriscore' : OFFAPIManager.get_product_data(product, "nutrition_grade_fr"),
+                'energy_unit' : OFFAPIManager.get_product_data(product, "energy_unit"),
+                'energy_100g' : float(OFFAPIManager.get_product_data(product, "energy_100g")),
+                'proteins_100g' : float(OFFAPIManager.get_product_data(product, "proteins_100g")),
+                'fat_100g' : float(OFFAPIManager.get_product_data(product, "fat_100g")),
+                'saturated_fat_100g' : float(OFFAPIManager.get_product_data(product, "saturated-fat_100g")),
+                'carbohydrates_100g' : float(OFFAPIManager.get_product_data(product, "carbohydrates_100g")),
+                'sugars_100g' : float(OFFAPIManager.get_product_data(product, "sugars_100g")),
+                'fiber_100g' : float(OFFAPIManager.get_product_data(product, "fiber_100g")),
+                'salt_100g' : float(OFFAPIManager.get_product_data(product, "salt_100g"))
+            }
+        )
+
+    @classmethod
+    def add_products_to_db(cls) -> None:
+
+        print("\nMise à jour des données...")
+
+        products_created = 0
+
+        for product in OFFAPIManager.get_all_products():
+
+            product_obj, product_created = cls.__create_or_update_product_data(product)
+            cls.__create_or_update_media_data(product_obj, product)
+            cls.__create_or_update_nutrition_data(product_obj, product)
+
+            if product_created: products_created += 1
+
+        print(f"...{products_created} nouveau(x) produit(s) ajoutés(s)...\
+            \n{Product.objects.count()} produit(s) au total.\n")
+
+class Command(BaseCommand):
+    
+    def handle(self, *args, **options) -> None: 
+        
+        DBManager.check_data_already_in_db()
+        DBManager.add_products_to_db()
+
+        # DBManager.show_data("product_data")
+        # DBManager.show_data("media_data")
+        # DBManager.show_data("nutrition_data")
