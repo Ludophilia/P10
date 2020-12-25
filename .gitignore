@@ -6,4 +6,3 @@ chromedriver
 purbeurre/settings/production.py
 __pycache__
 __staticfiles
-exp.py
