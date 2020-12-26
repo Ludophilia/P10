@@ -20,7 +20,7 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
     @tag("t1-p1")
     def test_if_data_has_been_added(self):
         
-        print("\n1/4 - Test d'ajout: les produits ont-ils bien été ajoutés ? Y'a-t-il le meme nombre de produits dans chaque table ? Y'a-t-il plus de 15 produits par catégorie ?\n")
+        print("\nTest 1 - (1/4) : les produits ont-ils bien été ajoutés ? Y'a-t-il le meme nombre de produits dans chaque table ? Y'a-t-il plus de 15 produits par catégorie ?\n")
 
         total_products, total_nutrition, total_media = Product.objects.count(), Nutrition.objects.count(), Media.objects.count()
 
@@ -35,7 +35,7 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
     @tag("t1-p2")
     def test_the_quality_of_product_data(self):
 
-        print("\n2/4 - Test de qualité données : les produits ont-ils bien un nom ? Appartiennent-ils à une catégorie valide ? Ont-ils une adresse off valide?\n")
+        print("\nTest 1 - (2/4) : les produits ont-ils bien un nom ? Appartiennent-ils à une catégorie valide ? Ont-ils une adresse off valide?\n")
 
         for product in Product.objects.all():
             self.assertNotEqual(len(product.product_name), 0) 
@@ -45,7 +45,7 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
     @tag("t1-p3")
     def test_the_quality_of_media_data(self):
 
-        print("\n3/4 - Test de qualité données : les images ont-elles un format d'url valide ?\n")
+        print("\nTest 1 - (3/4) : les images ont-elles un format d'url valide ?\n")
 
         for media in Media.objects.all():
             for field in [media.image_full_url, media.image_front_url]:
@@ -55,7 +55,7 @@ class TestProductAdditionAndUpdateToDatabase(TestCase):
     @tag("t1-p4")
     def test_the_quality_of_nutrition_data(self):
         
-        print("\n4/4 - Test de qualité données : les données nutritionneles ont-elles un format valide ?\n")
+        print("\nTest 1 - (4/4) : les données nutritionneles ont-elles un format valide ?\n")
 
         for nutrition in Nutrition.objects.all():
 
