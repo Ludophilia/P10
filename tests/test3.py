@@ -15,7 +15,7 @@ class AssistanceClass:
 
     def setUp(self):
         call_command("loaddata", "website/dumps/website.json")
-        ext = ("tux", "78.0.3904.105") if os.environ.get("TEST_ENV") == "TRAVIS_CI" else ("mac", "87.0.4280.88")
+        ext = ("tux", "87.0.4280.88") if os.environ.get("TEST_ENV") == "TRAVIS_CI" else ("mac", "87.0.4280.88")
 
         self.driver = ChromeDriverMgr.get_chromedriver(*ext)
         self.driver.get(f"{self.live_server_url}") 
