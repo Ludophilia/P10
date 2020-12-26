@@ -1,6 +1,7 @@
 import random
 
 from django.test import TestCase, tag 
+from django.core.management import call_command
 
 from website.management.commands.add_off_data import Command
 from website.models import Product, Nutrition, Media
@@ -10,12 +11,12 @@ from website.selection_tools import replacement_picker
 class TestProductSelectorModule(TestCase):
     
     def setUp(self):
-        Command().handle() 
+        call_command("loaddata", "website/dumps/website.json") #Command().handle() #Calls OFF API everytime, which is a bit expensive tbh.
 
     @tag("t2-p1")
     def test_if_replacement_picker_only_accepts_int(self):
         
-        print("\n1/2 - Test : replacement_picker() n'accepte-t-il que des Integers ?\n")
+        print("\n1/2 - Test 2 : replacement_picker() n'accepte-t-il que des Integers ?\n")
 
         product_pos = random.randint(0, Product.objects.count()-1)
         random_product = Product.objects.all()[product_pos]
@@ -26,7 +27,7 @@ class TestProductSelectorModule(TestCase):
 
     @tag("t2-p2")
     def test_if_the_replacement_product_is_better_from_a_nutrition_standpoint(self):
-        print("\n2/2 - Test : replacement_picker() offre-t-il des produits au nutriscore équivalent ou meilleur?\n")
+        print("\n2/2 - Test 2 : replacement_picker() offre-t-il des produits au nutriscore équivalent ou meilleur?\n")
 
         products = Product.objects.all()
 

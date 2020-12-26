@@ -26,3 +26,4 @@ before_script:
 script:
  - ./manage.py test tests/ --tag=t1 --keepdb
  - ./manage.py test tests/ --tag=t2 --keepdb
+ - ./manage.py test tests.test3 --keepdb

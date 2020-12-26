@@ -1,53 +1,70 @@
-import os
+import os, time
 
-from django.test import tag 
+from django.test import tag, Client
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase 
+from django.contrib.auth.models import User
+from django.core.management import call_command
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 
 from tests.chromedrivermgr import ChromeDriverMgr
+from website.models import Product, Nutrition, Media
 from website.management.commands.add_off_data import Command
 
-@tag("t3")
-class TestProductReplacementFunction(StaticLiveServerTestCase):
-    
+class AssistanceClass:
+
     def setUp(self):
-        Command().handle()
-        self.driver = ChromeDriverMgr.get_chromedriver("mac", "84.0.4147.30")
+        call_command("loaddata", "website/dumps/website.json") #Command().handle() #Calls OFF API everytime, which is a bit expensive tbh
+        self.driver = ChromeDriverMgr.get_chromedriver("mac", "87.0.4280.88")
+        self.driver.get(f"{self.live_server_url}") 
 
     def tearDown(self):
-        self.driver.quit() 
+        self.driver.quit()
+    
+    def create_luser_and_sign_up(self):
+        self.driver.get(f"{self.live_server_url}/signin")
 
-    @tag("t3-p1")
+        self.user = dict(username = "lusername", password = "mucho_secure")
+
+        User.objects.create_user(username = self.user['username'], password = self.user['password'])
+
+        for type_field in self.user: 
+            field = self.driver.find_element_by_name(type_field)
+            field.send_keys(self.user[type_field])
+
+            if type_field == "password":
+                field.submit()
+
+@tag("t3a")
+class TestProductReplacementFunction(AssistanceClass,StaticLiveServerTestCase):
+
+    @tag("t3a-p1")
     def test_if_the_product_replacement_is_working_correctly(self):
+        print("\n1/2 - Test 3a : la fonctionnalité de remplacement de produit via le formulaire fonctionne-t-elle ?\n")
 
-        products = ["bâtonnets de surimi", "Orangina", "Perrier fines bulles", "Pâtes Spaghetti au blé complet", "Salade de quinoa aux légumes", "Magnum Double Caramel"]
-        
-        substitutes = ["Filets de Colin Panés", "Cristaline", "Cristaline", "Coquillettes", "Betteraves à la Moutarde à l'Ancienne", "Les bios vanille douce sava"]
-        i = 0
+        products = ["bâtonnets de surimi", "Orangina", "Perrier fines bulles", "Pâtes Spaghetti au blé complet", "Filets de Colin Panés", "Coquillettes", "Betteraves à la Moutarde à l'Ancienne"]
         
         for product in products:
-            pass
-            self.driver.get(f"{self.live_server_url}") 
 
-            searchbox = self.driver.find_element_by_name("query")
+            searchbox = self.driver.find_elements_by_css_selector("input.form-control")[1]
             searchbox.send_keys(product)
             searchbox.submit()
 
             time.sleep(2)
 
             substitute_name = self.driver.find_element_by_css_selector(".results.card-title").text
-            # self.assertEqual(substitute_name, substitutes[i]) # Retiré, le nom des substituts a changé en 1 mois et demi... Diable. Seul le nutriscore sera testé
 
             product_nutriscore = Product.objects.get(product_name__iexact=product).nutrition.nutriscore
             substitute_nutriscore = Product.objects.get(product_name__iexact=substitute_name).nutrition.nutriscore     
 
             self.assertLessEqual(ord(substitute_nutriscore), ord(product_nutriscore))
-            i+=1
-        
-    @tag("repl_404")
+
+            self.driver.get(f"{self.live_server_url}") 
+
+    @tag("t3a-p2")
     def test_if_404_is_correctly_raised(self):
         
-        self.driver.get("{}".format(self.live_server_url)) 
+        print("\n2/2 - Test 3a : l'utilisateur est-il bien redirigé vers une page d'erreur en cas de requête invalide ?\n")
 
         searchbox = self.driver.find_element_by_name("query")
         searchbox.send_keys("orangin")
@@ -57,115 +74,38 @@ class TestProductReplacementFunction(StaticLiveServerTestCase):
         error = self.driver.find_element_by_css_selector("h1").text
         self.assertEqual(error,"Not Found") #En mode débug s'entend
 
-@tag("nav")
-class TestNavBarBehaviour(StaticLiveServerTestCase):    
-    
-    @tag("se-connecter")
+@tag("t3b")
+class TestNavBarBehavior(AssistanceClass,StaticLiveServerTestCase):
+
+    @tag("t3b-p1")
     def test_if_se_connecter_appear_in_menubar_when_the_user_is_not_connected(self):
-        # Tester que qu'il y ait bien marquer se connecter dans le logo de connection
 
-        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)), "chromedriver"))
+        print("\nTest 3b - (1/3) : Le bouton 'se connecter' apparait-il quand l'utilisateur n'est pas connecté ?\n")
 
-        self.driver.get(self.live_server_url)
         connect_logo = self.driver.find_element_by_css_selector(".fas.fa-user")
         self.assertEqual(connect_logo.text, "Se connecter")
 
-        self.driver.quit()
-
-    @tag("nav-redirect")
-    def test_if_anonymous_user_is_redirected_to_sign_in_page(self):
-        # Tester que appuyer sur mon compte envoie la page de connexion en mode Anonymous user
-
-        self.client = Client()
-
-        response = self.client.get("/account")
-        self.assertRedirects(response,"/signin?next=/account")
-
-    @tag("mon-compte")
+    @tag("t3b-p2")
     def test_if_mon_compte_appear_in_menubar_when_the_user_is_connected(self):
-        # Tester que qu'il y ait bien marquer se connecter dans le logo de connection une fois connecté
-        self.selenium_is_active = True
-        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)),"chromedriver"))
-        self.driver.get("{}{}".format(self.live_server_url, "/signin"))
-        
-        user_info = {
-            "username" : "lusername",
-            "password" : "mucho_secure"
-        }
 
-        User.objects.create_user(
-            username = user_info['username'],
-            password = user_info['password']
-        )
+        print("\nTest 3b - (2/3) : Le bouton 'mon compte' apparait-il quand l'utilisateur est connecté ?\n")
 
-        for type_field in user_info: 
-            field = self.driver.find_element_by_name(type_field)
-            field.send_keys(user_info[type_field])
-
-            if type_field == "password":
-                field.submit()
+        self.create_luser_and_sign_up()
 
         mon_compte = self.driver.find_element_by_css_selector(".fas.fa-user")
-
         self.assertEqual(mon_compte.text, "Mon compte")
-        self.driver.quit()
 
-    @tag("access")
-    def test_if_a_connected_user_can_access_to_mon_compte_page(self):
-
-        # Tester qu'un utilisateur connecté peut accéder au compte
-
-        self.client = Client()
-
-        user_info = {
-            "username" : "username",
-            "password" : "password"
-        }
-
-        User.objects.create_user(
-            username = user_info["username"],
-            password = user_info["password"]
-        )
-
-        self.client.post("/signin", data=user_info)
-        response = self.client.get("/account")
-
-        self.assertEqual(response.status_code, 200) #Si 200, c'est qu'on a pu accéder, si c'est  c'est 302 c'est qu'il y a eu une redirection
-
-    @tag("deco")
+    @tag("t3b-p3")
     def test_if_clicking_on_logout_button_does_logout_the_user(self):
-        
-        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)), "chromedriver"))
 
-        self.driver.get("{}{}".format(self.live_server_url, "/signin"))
-        
-        user_info = {
-            "username" : "lusername",
-            "password" : "mucho_secure"
-        }
+        print("\nTest 3b - (3/3) : Appuyer sur le bouton de déco déconnecte-t-il l'utilisateur ?\n")
 
-        User.objects.create_user(
-            username = user_info['username'],
-            password = user_info['password']
-        )
-
-        for type_field in user_info: 
-            field = self.driver.find_element_by_name(type_field)
-            field.send_keys(user_info[type_field])
-
-            if type_field == "password":
-                field.submit()
+        self.create_luser_and_sign_up()
 
         time.sleep(3)
 
-        self.actions = ActionChains(self.driver)
-
         logout = self.driver.find_element_by_css_selector(".fas.fa-sign-out-alt")
-
-        self.actions.move_to_element(logout).click().perform()
+        ActionChains(self.driver).move_to_element(logout).click().perform()
 
         mon_compte = self.driver.find_element_by_css_selector(".fas.fa-user")
-
         self.assertEqual(mon_compte.text, "Se connecter")
-        self.driver.quit()
-        

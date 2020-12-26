@@ -21,9 +21,40 @@ options = webdriver.ChromeOptions()
 
 # And now the tests.
 
+@tag("t3b")
+class TestNavBarBehavior(StartupClass,StaticLiveServerTestCase):    
 
+    @tag("t3b-p2")
+    def test_if_anonymous_user_is_redirected_to_sign_in_page(self):
+        
+        print("\nTest 3b - (2/5) : Un utilisateur anonyme est-il redirigé vers la page de connexion quand il essaie d'accéder à sa page de compte ?\n")
+        
+        self.client = Client()
 
+        response = self.client.get("/account")
+        self.assertRedirects(response,"/signin?next=/account")
+        
+    @tag("access")
+    def test_if_a_connected_user_can_access_to_mon_compte_page(self):
 
+        # Tester qu'un utilisateur connecté peut accéder au compte
+
+        self.client = Client()
+
+        user_info = {
+            "username" : "username",
+            "password" : "password"
+        }
+
+        User.objects.create_user(
+            username = user_info["username"],
+            password = user_info["password"]
+        )
+
+        self.client.post("/signin", data=user_info)
+        response = self.client.get("/account")
+
+        self.assertEqual(response.status_code, 200) #Si 200, c'est qu'on a pu accéder, si c'est  c'est 302 c'est qu'il y a eu une redirection
 
 @tag("account")
 class TestUserAccountCreation(StaticLiveServerTestCase):
