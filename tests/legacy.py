@@ -21,40 +21,9 @@ options = webdriver.ChromeOptions()
 
 # And now the tests.
 
-@tag("t3b")
-class TestNavBarBehavior(StartupClass,StaticLiveServerTestCase):    
+###########################################################################
 
-    @tag("t3b-p2")
-    def test_if_anonymous_user_is_redirected_to_sign_in_page(self):
-        
-        print("\nTest 3b - (2/5) : Un utilisateur anonyme est-il redirigé vers la page de connexion quand il essaie d'accéder à sa page de compte ?\n")
-        
-        self.client = Client()
-
-        response = self.client.get("/account")
-        self.assertRedirects(response,"/signin?next=/account")
-        
-    @tag("access")
-    def test_if_a_connected_user_can_access_to_mon_compte_page(self):
-
-        # Tester qu'un utilisateur connecté peut accéder au compte
-
-        self.client = Client()
-
-        user_info = {
-            "username" : "username",
-            "password" : "password"
-        }
-
-        User.objects.create_user(
-            username = user_info["username"],
-            password = user_info["password"]
-        )
-
-        self.client.post("/signin", data=user_info)
-        response = self.client.get("/account")
-
-        self.assertEqual(response.status_code, 200) #Si 200, c'est qu'on a pu accéder, si c'est  c'est 302 c'est qu'il y a eu une redirection
+###########################################################################``
 
 @tag("account")
 class TestUserAccountCreation(StaticLiveServerTestCase):
@@ -94,6 +63,7 @@ class TestUserAccountCreation(StaticLiveServerTestCase):
         self.assertEqual(user_added.email, user_info["mail"])
         self.assertTrue(check_password(user_info["password"], user_added.password))
 
+
 @tag("connect")
 class TestUserAccountConnection(StaticLiveServerTestCase):
     def setUp(self):
@@ -102,6 +72,16 @@ class TestUserAccountConnection(StaticLiveServerTestCase):
     def tearDown(self):
         self.driver.quit() 
 
+    @tag("t3b-p2")
+    def test_if_anonymous_user_is_redirected_to_sign_in_page(self):
+        
+        print("\nTest 3b - (2/5) : Un utilisateur anonyme est-il redirigé vers la page de connexion quand il essaie d'accéder à sa page de compte ?\n")
+        
+        self.client = Client()
+
+        response = self.client.get("/account")
+        self.assertRedirects(response,"/signin?next=/account")
+        
     def test_if_connection_form_displays_the_error_message(self):
 
         user_info = {
@@ -239,6 +219,28 @@ class TestAccountPage(StaticLiveServerTestCase):
     def tearDown(self):
         self.driver.quit()
 
+    @tag("access")
+    def test_if_ONLY_a_connected_user_can_access_to_mon_compte_page(self):
+
+        # Tester qu'un utilisateur connecté peut accéder au compte
+
+        self.client = Client()
+
+        user_info = {
+            "username" : "username",
+            "password" : "password"
+        }
+
+        User.objects.create_user(
+            username = user_info["username"],
+            password = user_info["password"]
+        )
+
+        self.client.post("/signin", data=user_info)
+        response = self.client.get("/account")
+
+        self.assertEqual(response.status_code, 200) #Si 200, c'est qu'on a pu accéder, si c'est  c'est 302 c'est qu'il y a eu une redirection
+
     @tag("myusername")
     def test_if_user_name_appear_on_account_page_header(self):
         
@@ -264,6 +266,12 @@ class TestAccountPage(StaticLiveServerTestCase):
 
         fieldset = self.driver.find_element_by_css_selector("fieldset")
         self.assertEqual(fieldset.get_attribute("disabled"), "true")
+
+###########################################################################
+
+
+
+###########################################################################
 
 class TestSubstituteRecording(StaticLiveServerTestCase):
 
@@ -392,6 +400,12 @@ class TestSubstituteRecording(StaticLiveServerTestCase):
         # print(second_save_link, second_save_link.text)
         self.assertIn("Connectez-vous pour", second_save_link.text)
 
+###########################################################################
+
+
+
+###########################################################################
+
 @tag("my")
 class TestMyProductPage(StaticLiveServerTestCase):
     
@@ -505,83 +519,7 @@ class TestMyProductPage(StaticLiveServerTestCase):
 
         self.assertEqual(Record.objects.count(), 0)
 
-@tag("prodwork")
-class TestProductPageDjC(TestCase):
-    
-    def setUp(self):
-        command = Command()
-        command.handle()
-        
-    def test_if_the_webpage_is_correctly_displayed(self):
-
-        self.client = Client()
-        self.response = self.client.get(reverse("product"), {'query':'Orangina'})
-        self.assertEqual(self.response.status_code, 200)
-
-@tag("product")
-class TestProductPage(StaticLiveServerTestCase):
-
-    def setUp(self):
-        command = Command()
-        command.handle()
-
-        self.driver = webdriver.Chrome(os.path.join(os.path.dirname(os.path.dirname(__file__)),'chromedriver'))
-
-    def tearDown(self):
-        self.driver.quit()
-
-    @tag("prodred")
-    def test_if_the_link_to_a_product_page_from_the_result_page_works_perfectly(self):
-        
-        #On est en mode anonyme, je précise bien que ça ne change pas grand chose
-
-        product_list = ["orangina", "nutella", "salade de quinoa aux légumes"] #On peut en mettre plus
-        product = product_list[random.randint(0, len(product_list)-1)]
-
-        self.driver.get("{}{}".format(self.live_server_url, "/search?query={}".format(product)))
-
-        product_links = self.driver.find_elements_by_css_selector("h3 > a")
-
-        product_index = random.randint(0,len(product_links)-1)
-        selected_link = product_links[product_index]
-
-        selected_link_url = product_url_builder(selected_link.text)
-        absolute_selected_link_url = "{}{}".format(self.live_server_url, selected_link_url)
-        
-        ActionChains(self.driver).click(selected_link).perform()
-        time.sleep(2)
-
-        self.assertEqual(self.driver.current_url, absolute_selected_link_url)
-
-        #Si cliquer sur n'importe quel lien lien dans la page de résultat renvoie vers la page produit
-
-    @tag("prodat")
-    def test_if_the_right_data_is_on_the_product_page(self):
-
-        product_list = ["orangina", "nutella", "salade de quinoa aux légumes"] #On peut en mettre plus
-        product_selected = product_list[random.randint(0, len(product_list)-1)]
-
-        self.driver.get("{}{}".format(self.live_server_url, "/search?query={}".format(product_selected)))
-
-        substitutes_links = self.driver.find_elements_by_css_selector("h3 > a")
-        selected_link = substitutes_links[random.randint(0,len(substitutes_links)-1)]
-        ActionChains(self.driver).click(selected_link).perform()
-
-        time.sleep(1)
-        
-        product_data = self.driver.find_element_by_css_selector("h2 + p")
-        nutriscore = self.driver.find_elements_by_css_selector("img[src*='images/misc/nutriscore']")
-        dict_product_data = {}
-
-        for combinaison in product_data.text.split("\n"):
-            combinaison_list = combinaison.split(":")
-            if len(combinaison_list) > 1:
-                product_data_key = combinaison_list[0].replace(" ", "")
-                product_data_value = combinaison_list[1].replace(" ", "")
-                dict_product_data[product_data_key] = product_data_value
-        
-        self.assertEqual(len(dict_product_data), 5) #S'il y a 5 couples clé valeur, c'est que les données nutritionelles ont bien été transmises au template, indépendamment de leur qualité
-        self.assertEqual(len(nutriscore), 1) #On vérifie la présence de l'image représentant le nutriscore
+###########################################################################
 
 @tag("legwork")
 class TestLegalPageDjC(StaticLiveServerTestCase):
@@ -600,6 +538,8 @@ class TestLegalPage(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.driver.quit()
+
+###########################################################################
 
 @tag("autoc")
 class TestAutocompleteFeature(StaticLiveServerTestCase):
