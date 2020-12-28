@@ -14,15 +14,15 @@ class TestUserAccountCreation(BaseClassForSLSTC):
         
         print("\nTest 5a - (1/1) : l'ajout d'un utilisateur en BDD fonctionne-t-il sans problème ?\n")
 
-        self.get_or_create_luser_and_sign_up()
+        luser = self.get_or_create_luser_and_sign_up(True)
         time.sleep(1)
         user_added = User.objects.get(username="lusername")
 
-        self.assertEqual(user_added.username, self.user["username"])
-        self.assertEqual(user_added.first_name, self.user["first_name"])
-        self.assertEqual(user_added.last_name, self.user["last_name"])
-        self.assertEqual(user_added.email, self.user["email"])
-        self.assertTrue(check_password(self.user["password"], user_added.password))
+        self.assertEqual(user_added.username, luser["username"])
+        self.assertEqual(user_added.first_name, luser["first_name"])
+        self.assertEqual(user_added.last_name, luser["last_name"])
+        self.assertEqual(user_added.email, luser["email"])
+        self.assertTrue(check_password(luser["password"], user_added.password))
 
 @tag("t5b")
 class TestUserAccountConnection(BaseClassForSLSTC):
