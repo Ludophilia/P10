@@ -69,7 +69,7 @@ class TestNavBarBehaviorWhenConnected(BaseClassForSLSTC):
 
     def setUp(self):
         super().setUp()
-        self.sign_up()
+        self.get_or_create_luser_and_sign_up()
 
     @tag("t3c-p1")
     def test_if_mon_compte_appear_in_menubar_when_the_user_is_connected(self):

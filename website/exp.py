@@ -23,9 +23,16 @@
 
 # print(a)
 
-_, z = (1, 3)
-print(_)
-print(z)
+element = (username = "lusername", 
+            password = "123456",
+            last_name = "Makegumi",
+            first_name = "Taro",
+            mail = "lusername@makeinu.co.jp")
+
+print(element)
+# _, z = (1, 3)
+# print(_)
+# print(z)
 
 # l = [a+=[x] for x in [1,1,1,1,1,2]]
 # print(l)

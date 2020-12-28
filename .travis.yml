@@ -24,3 +24,4 @@ script:
  - ./manage.py test tests/ --tag=t2 --keepdb
  - ./manage.py test tests.test3 --keepdb
  - ./manage.py test tests.test4 --keepdb
+ - ./manage.py test tests.test5 --keepdb

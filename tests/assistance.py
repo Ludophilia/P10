@@ -43,20 +43,46 @@ class BaseClassForSLSTC(StaticLiveServerTestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def get_luser(self):
-        self.user = dict(username = "lusername", password = "mucho_secure")
+    def get_or_create_luser(self, complete=False):
+        
+        base_luser = dict(
+            username = "lusername", 
+            password = "123456",
+        )
+
+        extra_luser = dict(
+            last_name = "Makegumi",
+            first_name = "Taro",
+            email = "lusername@makeinu.co.jp"
+        )
+
+        luser = {**base_luser , **extra_luser}
 
         if not User.objects.filter(username__exact = "lusername"):
-            User.objects.create_user(username = self.user['username'], password = self.user['password'])
+            User.objects.create_user(
+                username = luser['username'],
+                password = luser['password'],
+                last_name = luser['last_name'],
+                first_name = luser['first_name'],
+                email = luser['email']
+            )
+        
+        return base_luser if not complete else luser
 
-    def sign_up(self):
-        self.get_luser()
+    def sign_up(self, user):
 
         self.driver.get(f"{self.live_server_url}/signin")
 
-        for type_field in self.user: 
+        for type_field in ["username", "password"]: 
             field = self.driver.find_element_by_name(type_field)
-            field.send_keys(self.user[type_field])
+            field.send_keys(user[type_field])
 
             if type_field == "password":
                 field.submit()
+
+    def get_or_create_luser_and_sign_up(self, complete=False):
+
+        luser = self.get_or_create_luser(complete)
+        self.sign_up(luser)
+
+        return luser
