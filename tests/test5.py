@@ -4,10 +4,10 @@ from django.test import tag, Client
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 
-from tests.assistance import BaseClassForSLSTC
+from tests.assistance.frontend_tests import AssistanceClassForSLSTC
 
 @tag("t5a")
-class TestUserAccountCreation(BaseClassForSLSTC):
+class TestUserAccountCreation(AssistanceClassForSLSTC):
 
     @tag("t5a-p1")
     def test_if_user_account_data_is_correctly_added_to_the_database(self):
@@ -15,7 +15,6 @@ class TestUserAccountCreation(BaseClassForSLSTC):
         print("\nTest 5a - (1/1) : l'ajout d'un utilisateur en BDD fonctionne-t-il sans problème ?\n")
 
         luser = self.get_or_create_luser_and_sign_up(True)
-        time.sleep(1)
         user_added = User.objects.get(username="lusername")
 
         self.assertEqual(user_added.username, luser["username"])
@@ -25,7 +24,7 @@ class TestUserAccountCreation(BaseClassForSLSTC):
         self.assertTrue(check_password(luser["password"], user_added.password))
 
 @tag("t5b")
-class TestUserAccountConnection(BaseClassForSLSTC):
+class TestUserAccountConnection(AssistanceClassForSLSTC):
     
     @tag("t5b-p1")
     def test_if_connection_works_as_expected(self):
@@ -33,7 +32,6 @@ class TestUserAccountConnection(BaseClassForSLSTC):
         print("\nTest 5b - (1/2) : la connexion fonctionne-t-elle sans problèmes ? La redirection vers la page d'accueil se fait-elle correctement ?\n")
 
         self.get_or_create_luser_and_sign_up()
-        time.sleep(1)
         self.assertEqual(self.driver.current_url, f"{self.live_server_url}/")
 
     @tag("t5b-p2")
@@ -42,8 +40,7 @@ class TestUserAccountConnection(BaseClassForSLSTC):
         print("\nTest 5b - (2/2) : le message d'erreur apparait-il bien quand l'utilisateur entre un login incorrect ?\n")
 
         user = dict(username = "jobsfan123", password = "johnappleseed")
-        self.sign_up(user)
-        time.sleep(1)
+        self.sign_up_user(user)
 
         error_message = "Saisissez un nom d'utilisateur et un mot de passe valides. Remarquez que chacun de ces champs est sensible à la casse (différenciation des majuscules/minuscules)."
         error_message_in_webpage = self.driver.find_element_by_css_selector("ul.errorlist li")
@@ -51,12 +48,14 @@ class TestUserAccountConnection(BaseClassForSLSTC):
         self.assertEqual(error_message, error_message_in_webpage.text)
 
 @tag("t5c")
-class TestAccountPage(BaseClassForSLSTC):
+class TestAccountPage(AssistanceClassForSLSTC):
 
     def setUp_and_get_luser(self, complete=False):
 
         luser = self.get_or_create_luser_and_sign_up(complete)
         self.driver.get(f"{self.live_server_url}/account")
+        time.sleep(1)
+
         return luser
 
     @tag("t5c-p1")
@@ -81,7 +80,6 @@ class TestAccountPage(BaseClassForSLSTC):
         print("\nTest 5c - (2/4) : le nom de l'utilisateur apparait-il bien dans le header ?\n")
 
         luser = self.setUp_and_get_luser()
-        time.sleep(2)
 
         page_header = self.driver.find_element_by_css_selector("h1")
         self.assertEqual(page_header.text, f"Ahoy {luser['username']} !".upper())
@@ -92,7 +90,6 @@ class TestAccountPage(BaseClassForSLSTC):
         print("\nTest 5c - (3/4) : les infos de l'utilisateur figurent-elles bien dans le formulaire ?\n")
 
         luser = self.setUp_and_get_luser(True)
-        time.sleep(2)
         
         for fieldname in luser:
             selector = f"[name={fieldname}]" if fieldname != "email" else f"[type=email]"
@@ -107,7 +104,6 @@ class TestAccountPage(BaseClassForSLSTC):
         print("\nTest 5c - (4/4) : Le formulaire est-il bien désactivé ?\n")
 
         luser = self.setUp_and_get_luser()
-        time.sleep(2)
 
         fieldset = self.driver.find_element_by_css_selector("fieldset")
         self.assertEqual(fieldset.get_attribute("disabled"), "true")

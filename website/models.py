@@ -48,7 +48,7 @@ class Record(models.Model):
     substitute = models.ForeignKey(Product, to_field="product_name", on_delete=models.CASCADE, related_name='product_recorded_set')
 
     def __str__(self):
-        return f"Record<{self.user},{self.substitute}>"
+        return f"Record#{self.record_id}<{self.user},{self.substitute}>"
 
     class Meta:
         db_table = "record"

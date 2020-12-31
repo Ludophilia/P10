@@ -1,13 +1,12 @@
 import os, time
 
 from django.test import tag
-from selenium.webdriver.common.action_chains import ActionChains
 
-from tests.assistance import BaseClassForSLSTC
+from tests.assistance.frontend_tests import AssistanceClassForSLSTC
 from website.models import Product
 
 @tag("t3a")
-class TestProductReplacementFunction(BaseClassForSLSTC):
+class TestProductReplacementFunction(AssistanceClassForSLSTC):
 
     def setUp(self):
         super().setUp()
@@ -15,12 +14,12 @@ class TestProductReplacementFunction(BaseClassForSLSTC):
 
     @tag("t3a-p1")
     def test_if_the_product_replacement_is_working_correctly(self):
-        print("\nTest 3a - (1/2) : la fonctionnalité de remplacement de produit via le formulaire fonctionne-t-elle ?\n")
-
-        products = ["bâtonnets de surimi", "Orangina", "Perrier fines bulles", "Pâtes Spaghetti au blé complet", "Filets de Colin Panés", "Coquillettes", "Betteraves à la Moutarde à l'Ancienne"]
         
-        for product in products:
+        print("\nTest 3a - (1/2) : la fonctionnalité de remplacement de produit via le formulaire fonctionne-t-elle ?\n")
+        
+        for product in self.get_random_products(10):
 
+            product = product.product_name
             searchbox = self.driver.find_elements_by_css_selector("input.form-control")[1]
             searchbox.send_keys(product)
             searchbox.submit()
@@ -50,7 +49,7 @@ class TestProductReplacementFunction(BaseClassForSLSTC):
         self.assertEqual(error,"Not Found") #En mode débug s'entend
 
 @tag("t3b")
-class TestNavBarBehaviorWhenNotConnected(BaseClassForSLSTC):
+class TestNavBarBehaviorWhenNotConnected(AssistanceClassForSLSTC):
 
     def setUp(self):
         super().setUp()
@@ -65,7 +64,7 @@ class TestNavBarBehaviorWhenNotConnected(BaseClassForSLSTC):
         self.assertEqual(connect_logo.text, "Se connecter")
 
 @tag("t3c")
-class TestNavBarBehaviorWhenConnected(BaseClassForSLSTC):
+class TestNavBarBehaviorWhenConnected(AssistanceClassForSLSTC):
 
     def setUp(self):
         super().setUp()
@@ -84,10 +83,8 @@ class TestNavBarBehaviorWhenConnected(BaseClassForSLSTC):
 
         print("\nTest 3c - (2/2) : Appuyer sur le bouton de déco déconnecte-t-il l'utilisateur ?\n")
 
-        time.sleep(3)
-
         logout = self.driver.find_element_by_css_selector(".fas.fa-sign-out-alt")
-        ActionChains(self.driver).move_to_element(logout).click().perform()
+        logout.click()
 
         mon_compte = self.driver.find_element_by_css_selector(".fas.fa-user")
         self.assertEqual(mon_compte.text, "Se connecter")

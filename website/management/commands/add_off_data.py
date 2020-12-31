@@ -67,8 +67,8 @@ class OFFAPIManager:
 
         for product in all_products_raw:
             product_name = cls.get_product_data(product, "product_name_fr")
-            if product_name not in watchdog_scope:
-                watchdog_scope += [product_name]
+            if product_name.capitalize() not in watchdog_scope:
+                watchdog_scope += [product_name.capitalize()]
                 all_products += [product]
 
         return all_products

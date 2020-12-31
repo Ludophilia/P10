@@ -1,17 +1,18 @@
 import os
 from decimal import Decimal
 
-from django.test import TestCase, tag 
-from django.core.management import call_command
+from django.test import tag 
 
+from tests.assistance.backend_tests import AssistanceClassForTC
 from website.management.commands.add_off_data import Command
 from website.models import Product, Nutrition, Media
 
 @tag("t1")
-class TestProductAdditionAndUpdateToDatabase(TestCase):
+class TestProductAdditionAndUpdateToDatabase(AssistanceClassForTC):
     
     def setUp(self):
-        Command().handle() #call_command('loaddata', 'website/dumps/website.json') #Charge de vieilles données pour voir comment mon code réagit à la mise à jour
+        #call_command("loaddata", "website/dumps/dump.json") #Charge de vieilles données pour voir comment mon code réagit à la mise à jour
+        Command().handle() 
 
     def get_categories_from_categories_txt(self):
         with open(os.path.join("website", "management", "commands", "categories.txt")) as f: 
