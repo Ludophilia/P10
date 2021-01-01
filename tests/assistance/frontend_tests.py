@@ -5,19 +5,21 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.utils.http import urlencode
 from selenium.webdriver.remote.webelement import WebElement
 
-from website.models import Product
+from website.models import Product, Record
 from tests.assistance.chromedrivermgr import ChromeDriverMgr
 from tests.assistance.backend_tests import AssistanceClassForTC
 
 class AssistanceClassForSLSTC(StaticLiveServerTestCase):
 
     def setUp(self) -> None:
+
         AssistanceClassForTC().setUp()
 
         ext = ("tux", "87.0.4280.88") if os.environ.get("TEST_ENV") == "TRAVIS_CI" else ("mac", "87.0.4280.88")
         self.driver = ChromeDriverMgr.get_chromedriver(*ext)
 
     def tearDown(self) -> None:
+
         self.driver.quit()
 
     def get_or_create_luser(self, complete=False) -> dict:
@@ -65,9 +67,9 @@ class AssistanceClassForSLSTC(StaticLiveServerTestCase):
 
         return luser
 
-    def get_random_products(self, amount: int) -> list:
+    def get_random_products(self, amount: int, text_only: bool = False) -> list:
 
-        return AssistanceClassForTC().get_random_products(amount)
+        return AssistanceClassForTC().get_random_products(amount, text_only)
     
     def select_a_substitute(self, index: int = -1) -> (WebElement, WebElement):
 
@@ -90,5 +92,19 @@ class AssistanceClassForSLSTC(StaticLiveServerTestCase):
         return title_link, save_link
     
     def click_and_wait(self, webelement: WebElement, timeout: int) -> None:
+
         webelement.click()
         time.sleep(timeout)
+    
+    def authenticate_luser_and_save_some_products(self, amount: int, text_only: bool = False) -> list:
+
+        self.get_or_create_luser_and_sign_up()
+
+        products = self.get_random_products(amount, text_only=text_only)
+
+        for product in products:
+            Record.objects.create(
+                user = User.objects.get(username="lusername"),  
+                substitute = Product.objects.get(product_name=product))
+        
+        return products

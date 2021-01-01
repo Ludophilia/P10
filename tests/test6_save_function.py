@@ -33,7 +33,8 @@ class TestSubstituteRecording(AssistanceClassForSLSTC):
     @tag("t6-p2")
     def test_if_the_save_button_label_change_correctly_when_an_user_save_and_remove_a_product(self):
         
-        print("\nTest 6 - (2/3) : Le label sur le bouton de sauvegarde change-t-il en fonction de l'action de l'utilisateur ? Son état est-il conservé après rafraichissement\n")
+        print("\nTest 6 - (2/3) : Le label sur le bouton de sauvegarde change-t-il\
+             en fonction de l'action de l'utilisateur ? Son état est-il conservé après rafraichissement ?\n")
 
         self.get_or_create_luser_and_sign_up()
 
@@ -57,8 +58,6 @@ class TestSubstituteRecording(AssistanceClassForSLSTC):
     def test_if_the_save_button_label_is_correctly_hidden_to_an_anonymous_user(self):
         
         print("\nTest 6 - (3/3) : Le bouton de sauvegarde est-il bien caché à l'utilisateur anonyme ?\n")
-
-        self.driver.get(f"{self.live_server_url}/logout")
 
         for product in self.get_random_products(5):
 
