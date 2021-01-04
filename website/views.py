@@ -13,14 +13,12 @@ from website.models import Media, Product, Record
 from website.selection_tools import replacement_picker, wrapper
 from website.forms import RegistrationForm, SignInForm
 
-
 logger = logging.getLogger(__name__)
 
 def home(request):
 
-    logger.info('New visitor', exc_info=True, extra={
-        'request': request,
-    })
+    user_addr = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR')
+    logger.info(f"New visitor: {user_addr}", exc_info=False, extra={'request': request,})
     
     context = {'title': "P10 - Plateforme pour Amateurs de Nutella"}
         

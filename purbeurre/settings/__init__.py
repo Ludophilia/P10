@@ -4,6 +4,8 @@ import os
 
 import dj_database_url
 
+from .logging import RAVEN_CONFIG, LOGGING
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -17,6 +19,7 @@ ALLOWED_HOSTS = [] #["*"] pour DEBUG = False
 INSTALLED_APPS = [
     'website.apps.WebsiteConfig',
     'widget_tweaks',
+    'raven.contrib.django.raven_compat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
