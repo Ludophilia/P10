@@ -20,11 +20,11 @@ install:
 env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT", TEST_ENV="TRAVIS_CI"
 
 script:
- - ./manage.py test tests/ --tag=t1
- - ./manage.py test tests/ --tag=t2
- - ./manage.py test tests/ --tag=t3
- - ./manage.py test tests/ --tag=t4
- - ./manage.py test tests/ --tag=t5
- - ./manage.py test tests/ --tag=t6
- - ./manage.py test tests/ --tag=t7
- - ./manage.py test tests/ --tag=t8
+ - ./manage.py test tests.test1_product_addition_db
+ - ./manage.py test tests.test2_product_replacement
+ - ./manage.py test tests.test3_home_page
+ - ./manage.py test tests.test4_product_page
+ - ./manage.py test tests.test5_authentication
+ - ./manage.py test tests.test6_save_function
+ - ./manage.py test tests.test7_my_products_page
+ - ./manage.py test tests.test8_legal_page
