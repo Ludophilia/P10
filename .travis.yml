@@ -15,7 +15,7 @@ addons:
 
 install:
   - sudo apt install unzip
-  - pip install -r requirements.txt
+  - pip install -r tests/assistance/requirements-dev.txt
 
 env: DJANGO_SETTINGS_MODULE="purbeurre.settings.travis", ENV="DEVELOPMENT", TEST_ENV="TRAVIS_CI"
 
