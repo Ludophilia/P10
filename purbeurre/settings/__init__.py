@@ -4,7 +4,8 @@ import os
 
 import dj_database_url
 
-from .logging import RAVEN_CONFIG, LOGGING
+from .logging import RAVEN_CONFIG, LOGGING, INSTALLED_APPS
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -12,14 +13,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = True
 
-#Allowed hosts
-ALLOWED_HOSTS = [] #["*"] pour DEBUG = False
+ALLOWED_HOSTS = []
 
 # Application definition
-INSTALLED_APPS = [
+INSTALLED_APPS += [
     'website.apps.WebsiteConfig',
     'widget_tweaks',
-    'raven.contrib.django.raven_compat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -109,3 +108,4 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'),) 
+

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def home(request):
 
-    user_addr = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR')
+    user_addr = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
     logger.info(f"New visitor: {user_addr}", exc_info=False, extra={'request': request,})
     
     context = {'title': "P10 - Plateforme pour Amateurs de Nutella"}

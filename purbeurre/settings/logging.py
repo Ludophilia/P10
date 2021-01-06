@@ -3,8 +3,12 @@ import os
 import raven
 
 RAVEN_CONFIG = {
-    'dsn': f'https://{os.environ.get("SENTRY_DSN")}',
+    'dsn': os.environ.get('SENTRY_DSN'),
 }
+
+INSTALLED_APPS = [
+    'raven.contrib.django.raven_compat',
+]
 
 LOGGING = {
     'version': 1,
@@ -44,7 +48,6 @@ LOGGING = {
         'sentry': {
             'level': 'INFO', 
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-            'tags': {'custom-tag': 'the_freshest_tag'},
         },
     },
     'formatters': {
