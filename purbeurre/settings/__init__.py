@@ -1,22 +1,15 @@
-"""Django settings for purbeurre project."""
+"""Django base settings for purbeurre project."""
 
 import os
 
 import dj_database_url
 
-from .logging import RAVEN_CONFIG, LOGGING, INSTALLED_APPS
-
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 # Application definition
-INSTALLED_APPS += [
+INSTALLED_APPS = [
     'website.apps.WebsiteConfig',
     'widget_tweaks',
     'django.contrib.admin',
@@ -26,6 +19,7 @@ INSTALLED_APPS += [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+WSGI_APPLICATION = 'purbeurre.wsgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,20 +49,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'purbeurre.wsgi.application'
-
-# Database # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-DATABASES = { 
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pur_beurre',
-        'USER': 'P8',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '5432'
-    }
-}
-    
 # Password validation # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -107,5 +87,4 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #Donc
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'),) 
-
+STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'),)

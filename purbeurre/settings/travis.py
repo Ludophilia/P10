@@ -1,4 +1,10 @@
-from . import * #from <current_package> import *. Imports __init__.py code.
+"""Django travis specific settings for purbeurre project.""" 
+
+from . import *
+
+DEBUG = True
+
+ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
@@ -10,4 +16,3 @@ DATABASES = {
         'PORT': '',
     },
 }
-

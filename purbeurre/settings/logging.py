@@ -6,7 +6,7 @@ RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN'),
 }
 
-INSTALLED_APPS = [
+RAVEN_INSTALLED_APP = [
     'raven.contrib.django.raven_compat',
 ]
 
