@@ -19,8 +19,7 @@ class TestSubstituteRecording(AssistanceClassForSLSTC):
 
         for product in self.get_random_products(10):
             
-            random_number = random.randint(0, 5)
-            subsitute_name, save_link = self.replace_product_and_select_a_substitute(product.product_name, random_number)
+            subsitute_name, save_link = self.replace_product_and_select_a_substitute(product.product_name, -1)
                 
             self.click_and_wait(save_link, 1)
             
@@ -39,9 +38,8 @@ class TestSubstituteRecording(AssistanceClassForSLSTC):
         self.get_or_create_luser_and_sign_up()
 
         for product in self.get_random_products(5):
-
-            random_number = random.randint(0,5)
-
+            
+            random_number = random.randint(0,2)
             save_link = self.replace_product_and_select_a_substitute(product.product_name, random_number)[1]
 
             self.assertEqual("Sauvegarder", save_link.text)
@@ -61,6 +59,6 @@ class TestSubstituteRecording(AssistanceClassForSLSTC):
 
         for product in self.get_random_products(5):
 
-            con_link = self.replace_product_and_select_a_substitute(product.product_name)[1]
+            con_link = self.replace_product_and_select_a_substitute(product.product_name, -1)[1]
 
             self.assertIn("Connectez-vous pour", con_link.text)
